@@ -1,0 +1,5 @@
+/image/variables.json
+/keys/*
+!/keys/cluster.pub
+/.terraform
+terraform.tfstate*
