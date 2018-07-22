@@ -3,3 +3,4 @@
 !/keys/cluster.pub
 /.terraform
 terraform.tfstate*
+terraform.tfvars
