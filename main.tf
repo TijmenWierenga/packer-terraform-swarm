@@ -29,7 +29,7 @@ resource "aws_instance" "master" {
   }
 
   provisioner "local-exec" {
-    command = "ssh -o 'StrictHostKeyChecking no' -i 'keys/cluster' ubuntu@${self.public_ip} 'docker swarm join-token manager -q' >> artifacts/manager-token.txt"
+    command = "ssh -o 'StrictHostKeyChecking no' -i 'keys/cluster' ubuntu@${self.public_ip} 'docker swarm join-token manager -q' > artifacts/manager-token.txt"
   }
 }
 
@@ -55,7 +55,7 @@ resource "aws_instance" "manager" {
 
   provisioner "remote-exec" {
     inline = [
-      "docker swarm join --token $(cat /var/tmp/manager-token.txt) --advertise-addr ${self.private_ip}:2377",
+      "docker swarm join --token $(cat /var/tmp/manager-token.txt) ${aws_instance.master.private_ip}:2377",
       "rm /var/tmp/manager-token.txt"
     ]
   }
@@ -119,10 +119,18 @@ resource "aws_security_group" "docker" {
   }
 }
 
-output "master_ip" {
+output "master_public_ip" {
   value = "${aws_instance.master.public_ip}"
 }
 
-output "manager_ips" {
+output "master_private_ip" {
+  value = "${aws_instance.master.private_ip}"
+}
+
+output "manager_public_ips" {
   value = "${aws_instance.manager.*.public_ip}"
+}
+
+output "manager_private_ips" {
+  value = "${aws_instance.manager.*.private_ip}"
 }
